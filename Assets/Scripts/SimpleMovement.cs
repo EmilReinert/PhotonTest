@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Com.MyCompany.MyGame
 {
-    public class SimpleMovement : MonoBehaviour
+    public class SimpleMovement : Photon.Pun.MonoBehaviourPun
     {
         Animator ani;
         float stepwidth = 0.1f;

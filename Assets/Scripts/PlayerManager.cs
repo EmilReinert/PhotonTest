@@ -62,6 +62,9 @@ namespace Com.MyCompany.MyGame
             if (photonView.IsMine)
             {
                 PlayerManager.LocalPlayerInstance = this.gameObject;
+
+                float offset = Random.Range(-5, 5);
+                transform.position = new Vector3(offset, 5f, offset);
             }
             // #Critical
             // we flag as don't destroy on load so that instance survives level synchronization, thus giving a seamless experience when levels load.
@@ -77,28 +80,29 @@ namespace Com.MyCompany.MyGame
             ProcessInputs();
             
         }
-#if !UNITY_5_4_OR_NEWER
-/// <summary>See CalledOnLevelWasLoaded. Outdated in Unity 5.4.</summary>
-void OnLevelWasLoaded(int level)
-{
-    this.CalledOnLevelWasLoaded(level);
-}
-#endif
-#if UNITY_5_4_OR_NEWER
+        #if !UNITY_5_4_OR_NEWER
+        /// <summary>See CalledOnLevelWasLoaded. Outdated in Unity 5.4.</summary>
+        void OnLevelWasLoaded(int level)
+        {
+            this.CalledOnLevelWasLoaded(level);
+        }
+        #endif
+        #if UNITY_5_4_OR_NEWER
         public override void OnDisable()
         {
             // Always call the base to remove callbacks
             base.OnDisable();
             UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
         }
-#endif
+        #endif
 
         void CalledOnLevelWasLoaded(int level)
         {
             // check if we are outside the Arena and if it's the case, spawn around the center of the arena in a safe zone
             if (!Physics.Raycast(transform.position, -Vector3.up, 5f))
             {
-                transform.position = new Vector3(0f, 5f, 0f);
+                float offset = Random.Range(-5,5);
+                transform.position = new Vector3(offset, 5f, offset);
             }
         }
         #endregion
