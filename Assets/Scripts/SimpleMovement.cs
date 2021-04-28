@@ -7,6 +7,8 @@ namespace Com.MyCompany.MyGame
 {
     public class SimpleMovement : Photon.Pun.MonoBehaviourPun
     {
+        [SerializeField]
+        private float directionDampTime = 0.25f;
         Animator ani;
         float stepwidth = 0.1f;
         public Color c;
@@ -16,7 +18,7 @@ namespace Com.MyCompany.MyGame
             ani = GetComponent<Animator>();
             foreach (MeshRenderer m in GetComponentsInChildren<MeshRenderer>())
             {
-                m.material.color = c;
+                m.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f); ;
             }
         }
 
@@ -28,27 +30,31 @@ namespace Com.MyCompany.MyGame
             {
                 return;
             }
-            if (Input.GetAxis("Horizontal") > 0)
+            // failSafe is missing Animator component on GameObject
+            if (!ani)
             {
-                transform.Translate(new Vector3(1, 0, 0) * stepwidth);
+                return;
             }
-            if (Input.GetAxis("Horizontal") < 0)
-            {
-                transform.Translate(new Vector3(1, 0, 0) * -stepwidth);
-            }
-            if (Input.GetAxis("Vertical") < 0)
-            {
-                transform.Translate(new Vector3(0, 0, 1) * -stepwidth);
-            }
-            if (Input.GetAxis("Vertical") > 0)
-            {
-                transform.Translate(new Vector3(0, 0, 1) * stepwidth);
-            }
+
 
             if (Input.GetAxis("Horizontal") == 0 && Input.GetAxis("Vertical") == 0)
                 ani.SetBool("isWalking", false);
             else
                 ani.SetBool("isWalking", true);
+
+            // deal with movement
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
+
+            // prevent negative Speed.
+            if (v < 0)
+            {
+                v = 0;
+            }
+
+            // set the Animator Parameters
+            //animator.SetFloat("Speed", h * h + v * v);
+            ani.SetFloat("Direction", h, directionDampTime, Time.deltaTime);
         }
     }
 }
