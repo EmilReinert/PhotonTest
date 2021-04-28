@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,11 @@ namespace Com.MyCompany.MyGame
         // Update is called once per frame
         void Update()
         {
+            // Prevent control is connected to Photon and represent the localPlayer
+            if (photonView.IsMine == false && PhotonNetwork.IsConnected == true)
+            {
+                return;
+            }
             if (Input.GetAxis("Horizontal") > 0)
             {
                 transform.Translate(new Vector3(1, 0, 0) * stepwidth);
