@@ -18,7 +18,7 @@ namespace Com.MyCompany.MyGame
         public static GameObject LocalPlayerInstance;
 
         public float stepwidth = 0.01f;
-        private ArrayList randomcolors;
+        private Vector3[] randomcolors = new Vector3[5];
 
 
 
@@ -37,11 +37,12 @@ namespace Com.MyCompany.MyGame
             CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
             //setting random colors
 
-            foreach (MeshRenderer m in GetComponentsInChildren<MeshRenderer>())
+            for(int i = 0; i<5;i++)
             {
-                randomcolors.Add(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f)) ;
+                Color c=(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f)) ;
+                randomcolors[i] = new Vector3(c.r, c.g, c.b);
             }
-            photonView.RPC("UpdateColor", RpcTarget.AllBuffered);
+            photonView.RPC("UpdateColor", RpcTarget.AllBuffered, randomcolors);
             
 
             if (_cameraWork != null)
@@ -150,12 +151,13 @@ namespace Com.MyCompany.MyGame
         }
 
         [PunRPC]
-        void UpdateColor()
+        void UpdateColor(Vector3[] colors)
         {
             int count = 0;
             foreach (MeshRenderer m in this.GetComponentsInChildren<MeshRenderer>())
             {
-                m.material.color = (Color)randomcolors[count++];
+                m.material.color = new Color(colors[count].x, colors[count].y, colors[count].z);
+                count++;
             }
         }
 
