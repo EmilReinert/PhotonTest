@@ -77,24 +77,9 @@ namespace Com.MyCompany.MyGame
         /// </summary>
         void Update()
         {
-            if (!photonView.IsMine)
-            { return; }
-                if (Input.GetAxis("Horizontal") > 0)
-            {
-                transform.Translate(new Vector3(1, 0, 0) * stepwidth);
-            }
-            if (Input.GetAxis("Horizontal") < 0)
-            {
-                transform.Translate(new Vector3(1, 0, 0) * -stepwidth);
-            }
-            if (Input.GetAxis("Vertical") < 0)
-            {
-                transform.Translate(new Vector3(0, 0, 1) * -stepwidth);
-            }
-            if (Input.GetAxis("Vertical") > 0)
-            {
-                transform.Translate(new Vector3(0, 0, 1) * stepwidth);
-            }
+            if (photonView.IsMine)
+            { this.ProcessInputs(); }
+
 
         }
         #if !UNITY_5_4_OR_NEWER
@@ -132,6 +117,22 @@ namespace Com.MyCompany.MyGame
         void ProcessInputs()
         {
 
+            if (Input.GetAxis("Horizontal") > 0)
+            {
+                transform.Translate(new Vector3(1, 0, 0) * stepwidth);
+            }
+            if (Input.GetAxis("Horizontal") < 0)
+            {
+                transform.Translate(new Vector3(1, 0, 0) * -stepwidth);
+            }
+            if (Input.GetAxis("Vertical") < 0)
+            {
+                transform.Translate(new Vector3(0, 0, 1) * -stepwidth);
+            }
+            if (Input.GetAxis("Vertical") > 0)
+            {
+                transform.Translate(new Vector3(0, 0, 1) * stepwidth);
+            }
         }
         #endregion
         #region IPunObservable implementation
@@ -141,6 +142,7 @@ namespace Com.MyCompany.MyGame
             if (stream.IsWriting)
             {
                 // We own this player: send the others our data
+
             }
             else
             {
