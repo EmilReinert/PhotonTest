@@ -18,7 +18,6 @@ namespace Com.MyCompany.MyGame
         public static GameObject LocalPlayerInstance;
 
         public float stepwidth = 0.01f;
-        private Vector3[] randomcolors = new Vector3[5];
 
 
 
@@ -37,19 +36,21 @@ namespace Com.MyCompany.MyGame
             CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
             //setting random colors
 
-            for(int i = 0; i<5;i++)
-            {
-                Color c=(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f)) ;
-                randomcolors[i] = new Vector3(c.r, c.g, c.b);
-            }
-            photonView.RPC("UpdateColor", RpcTarget.AllBuffered, randomcolors);
-            
+
 
             if (_cameraWork != null)
             {
                 if (photonView.IsMine)
                 {
                     _cameraWork.OnStartFollowing();
+                    // COloR handling
+                    Vector3[] randomcolors = new Vector3[5];
+                    for (int i = 0; i < 5; i++)
+                    {
+                        Color c = (Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f));
+                        randomcolors[i] = new Vector3(c.r, c.g, c.b);
+                    }
+                    photonView.RPC("UpdateColor", RpcTarget.AllBuffered, randomcolors);
                 }
             }
             else
@@ -77,7 +78,7 @@ namespace Com.MyCompany.MyGame
                 PlayerManager.LocalPlayerInstance = this.gameObject;
 
                 float offset = Random.Range(-5, 5);
-                transform.position = new Vector3(offset, 5f, offset);
+                transform.position = new Vector3(offset, 0f, offset);
             }
             // #Critical
             // we flag as don't destroy on load so that instance survives level synchronization, thus giving a seamless experience when levels load.
@@ -90,8 +91,8 @@ namespace Com.MyCompany.MyGame
         void Update()
         {
             if (!photonView.IsMine)
-            { return;}
-                if (Input.GetAxis("Horizontal") > 0)
+            { return; }
+            if (Input.GetAxis("Horizontal") > 0)
             {
                 transform.Translate(new Vector3(1, 0, 0) * stepwidth);
             }
@@ -109,33 +110,33 @@ namespace Com.MyCompany.MyGame
             }
 
         }
-        #if !UNITY_5_4_OR_NEWER
+#if !UNITY_5_4_OR_NEWER
         /// <summary>See CalledOnLevelWasLoaded. Outdated in Unity 5.4.</summary>
         void OnLevelWasLoaded(int level)
         {
             this.CalledOnLevelWasLoaded(level);
         }
-        #endif
-        #if UNITY_5_4_OR_NEWER
+#endif
+#if UNITY_5_4_OR_NEWER
         public override void OnDisable()
         {
             // Always call the base to remove callbacks
             base.OnDisable();
             UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoaded;
         }
-        #endif
+#endif
 
         void CalledOnLevelWasLoaded(int level)
         {
             // check if we are outside the Arena and if it's the case, spawn around the center of the arena in a safe zone
             if (!Physics.Raycast(transform.position, -Vector3.up, 5f))
             {
-                float offset = Random.Range(-5,5);
-                transform.position = new Vector3(offset, 5f, offset);
+                float offset = Random.Range(-5, 5);
+                transform.position = new Vector3(offset, 0f, offset);
             }
         }
         #endregion
-        
+
         #region IPun
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -154,15 +155,27 @@ namespace Com.MyCompany.MyGame
         void UpdateColor(Vector3[] colors)
         {
             int count = 0;
+            Color c;
             foreach (MeshRenderer m in this.GetComponentsInChildren<MeshRenderer>())
             {
-                m.material.color = new Color(colors[count].x, colors[count].y, colors[count].z);
+                c = new Color(colors[count].x, colors[count].y, colors[count].z);
+                m.material.color = c;
+                m.material.SetVector("_EmissionColor", c);
+                count++;
+
+            }
+            count = 0;
+           
+            foreach (Light m in this.GetComponentsInChildren<Light>())
+            {
+                c = new Color(colors[count].x, colors[count].y, colors[count].z);
+                m.color = c;
                 count++;
             }
-        }
 
+        }
+        #endregion
     }
-    #endregion
 }
 
 
