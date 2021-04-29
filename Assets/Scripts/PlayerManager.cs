@@ -12,11 +12,12 @@ namespace Com.MyCompany.MyGame
     /// Player manager.
     /// Handles fire Input and Beams.
     /// </summary>
-    public class PlayerManager : MonoBehaviourPunCallbacks
+    public class PlayerManager : MonoBehaviourPunCallbacks, IPunObservable
     {
         [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
         public static GameObject LocalPlayerInstance;
 
+        public float stepwidth = 0.01f;
 #if UNITY_5_4_OR_NEWER
         void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode loadingMode)
         {
@@ -76,9 +77,25 @@ namespace Com.MyCompany.MyGame
         /// </summary>
         void Update()
         {
+            if (!photonView.IsMine)
+            { return; }
+                if (Input.GetAxis("Horizontal") > 0)
+            {
+                transform.Translate(new Vector3(1, 0, 0) * stepwidth);
+            }
+            if (Input.GetAxis("Horizontal") < 0)
+            {
+                transform.Translate(new Vector3(1, 0, 0) * -stepwidth);
+            }
+            if (Input.GetAxis("Vertical") < 0)
+            {
+                transform.Translate(new Vector3(0, 0, 1) * -stepwidth);
+            }
+            if (Input.GetAxis("Vertical") > 0)
+            {
+                transform.Translate(new Vector3(0, 0, 1) * stepwidth);
+            }
 
-            ProcessInputs();
-            
         }
         #if !UNITY_5_4_OR_NEWER
         /// <summary>See CalledOnLevelWasLoaded. Outdated in Unity 5.4.</summary>
@@ -116,9 +133,23 @@ namespace Com.MyCompany.MyGame
         {
 
         }
-
         #endregion
+        #region IPunObservable implementation
+
+        public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+        {
+            if (stream.IsWriting)
+            {
+                // We own this player: send the others our data
+            }
+            else
+            {
+                // Network player, receive data
+            }
+        }
+
     }
-
-
+    #endregion
 }
+
+

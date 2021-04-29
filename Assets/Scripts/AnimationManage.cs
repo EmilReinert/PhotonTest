@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Com.MyCompany.MyGame
 {
-    public class SimpleMovement : Photon.Pun.MonoBehaviourPun
+    public class AnimationManage : Photon.Pun.MonoBehaviourPun
     {
         [SerializeField]
         private float directionDampTime = 0.25f;
@@ -41,20 +41,7 @@ namespace Com.MyCompany.MyGame
                 ani.SetBool("isWalking", false);
             else
                 ani.SetBool("isWalking", true);
-
-            // deal with movement
-            float h = Input.GetAxis("Horizontal");
-            float v = Input.GetAxis("Vertical");
-
-            // prevent negative Speed.
-            if (v < 0)
-            {
-                v = 0;
-            }
-
-            // set the Animator Parameters
-            //animator.SetFloat("Speed", h * h + v * v);
-            ani.SetFloat("Direction", h, directionDampTime, Time.deltaTime);
+            
         }
     }
 }
