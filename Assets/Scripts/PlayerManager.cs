@@ -18,6 +18,10 @@ namespace Com.MyCompany.MyGame
         public static GameObject LocalPlayerInstance;
 
         public float stepwidth = 0.01f;
+        private ArrayList randomcolors;
+
+
+
 #if UNITY_5_4_OR_NEWER
         void OnSceneLoaded(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode loadingMode)
         {
@@ -32,9 +36,10 @@ namespace Com.MyCompany.MyGame
         {
             CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
             //setting random colors
+
             foreach (MeshRenderer m in GetComponentsInChildren<MeshRenderer>())
             {
-                m.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f); ;
+                randomcolors.Add(Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f)) ;
             }
             photonView.RPC("UpdateColor", RpcTarget.AllBuffered);
             
@@ -147,9 +152,10 @@ namespace Com.MyCompany.MyGame
         [PunRPC]
         void UpdateColor()
         {
+            int count = 0;
             foreach (MeshRenderer m in this.GetComponentsInChildren<MeshRenderer>())
             {
-                m.material.color = m.material.color;
+                m.material.color = (Color)randomcolors[count++];
             }
         }
 
