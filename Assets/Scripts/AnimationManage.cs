@@ -16,10 +16,6 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             ani = GetComponent<Animator>();
-            foreach (MeshRenderer m in GetComponentsInChildren<MeshRenderer>())
-            {
-                m.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f); ;
-            }
         }
 
         // Update is called once per frame

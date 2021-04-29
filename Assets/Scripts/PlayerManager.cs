@@ -31,7 +31,13 @@ namespace Com.MyCompany.MyGame
         void Start()
         {
             CameraWork _cameraWork = this.gameObject.GetComponent<CameraWork>();
-
+            //setting random colors
+            foreach (MeshRenderer m in GetComponentsInChildren<MeshRenderer>())
+            {
+                m.material.color = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f); ;
+            }
+            photonView.RPC("UpdateColor", RpcTarget.AllBuffered);
+            
 
             if (_cameraWork != null)
             {
@@ -77,9 +83,24 @@ namespace Com.MyCompany.MyGame
         /// </summary>
         void Update()
         {
-            if (photonView.IsMine)
-            { this.ProcessInputs(); }
-
+            if (!photonView.IsMine)
+            { return;}
+                if (Input.GetAxis("Horizontal") > 0)
+            {
+                transform.Translate(new Vector3(1, 0, 0) * stepwidth);
+            }
+            if (Input.GetAxis("Horizontal") < 0)
+            {
+                transform.Translate(new Vector3(1, 0, 0) * -stepwidth);
+            }
+            if (Input.GetAxis("Vertical") < 0)
+            {
+                transform.Translate(new Vector3(0, 0, 1) * -stepwidth);
+            }
+            if (Input.GetAxis("Vertical") > 0)
+            {
+                transform.Translate(new Vector3(0, 0, 1) * stepwidth);
+            }
 
         }
         #if !UNITY_5_4_OR_NEWER
@@ -108,45 +129,27 @@ namespace Com.MyCompany.MyGame
             }
         }
         #endregion
-
-        #region Custom
-
-        /// <summary>
-        /// Processes the inputs. Maintain a flag representing when the user is pressing Fire.
-        /// </summary>
-        void ProcessInputs()
-        {
-
-            if (Input.GetAxis("Horizontal") > 0)
-            {
-                transform.Translate(new Vector3(1, 0, 0) * stepwidth);
-            }
-            if (Input.GetAxis("Horizontal") < 0)
-            {
-                transform.Translate(new Vector3(1, 0, 0) * -stepwidth);
-            }
-            if (Input.GetAxis("Vertical") < 0)
-            {
-                transform.Translate(new Vector3(0, 0, 1) * -stepwidth);
-            }
-            if (Input.GetAxis("Vertical") > 0)
-            {
-                transform.Translate(new Vector3(0, 0, 1) * stepwidth);
-            }
-        }
-        #endregion
-        #region IPunObservable implementation
+        
+        #region IPun
 
         public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
         {
             if (stream.IsWriting)
             {
                 // We own this player: send the others our data
-
             }
             else
             {
                 // Network player, receive data
+            }
+        }
+
+        [PunRPC]
+        void UpdateColor()
+        {
+            foreach (MeshRenderer m in this.GetComponentsInChildren<MeshRenderer>())
+            {
+                m.material.color = m.material.color;
             }
         }
 
